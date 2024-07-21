@@ -1,11 +1,13 @@
 metadata {
-   definition (name: "Custom Virtual Switch", namespace: "MyNamespace", author: "My Name") {
+   definition (name: "My Z-Wave Switch", namespace: "MyNamespace", author: "My Name") {
       capability "Actuator"
       capability "Switch"
    }
 
    preferences {
-      // none in this driver
+      // none for now -- but for Z-Wave devices, this would often
+      // include preferences to set configuration parameters in addition
+      // to conventional Hubitat logging preferences, etc.
    }
 }
 
@@ -17,15 +19,19 @@ def updated() {
    log.debug "updated()"
 }
 
+def parse(String description) {
+   // This is where incoming data from the device will be sent.
+   // For now, just log the raw data (we will discuss ways to handle
+   //  this later):
+   log.debug "parse: $description"
+}
+
 def on() {
-    // With a real device, you would normally send a Z-Wave/Zigbee/etc. command
-    // to the device here.  For a virtual device, we are simply generating an
-    // event to make the "switch" attribute "on". With a real device, you would
-    // typically wait to hear back from the device in parse() before doing so.
-    sendEvent(name: "switch", value: "on", descriptionText: "${device.displayName} switch is on")
+   // TO DO: Required command from Switch capability, logging for now:
+   log.warn "on() not yet implemented"
 }
 
 def off() {
-    // Same notes as for on(), above, apply here...
-    sendEvent(name: "switch", value: "off", descriptionText: "${device.displayName} switch is off")
+   // TO DO: Required command from Switch capability, logging for now:
+   log.warn "off() not yet implemented"
 }

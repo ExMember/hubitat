@@ -35,18 +35,15 @@ metadata {
 
 def installed() {
   log.debug "installed()"
-  // Sometimes you may wish to initialize attributes to default values here or
-  // call refresh() to fetch them (not implemented in this driver currently, but
-  // a reasonable command to implement for many devices)
+
+  // TODO: request statuses
 }
 
 def updated() {
   log.debug "updated()"
   log.warn "debug logging is: ${logEnable == true}"
-  log.warn "description logging is: ${txtEnable == true}"
-  if (logEnable) runIn(1800, "logsOff")  // 1800 seconds = 30 minutes
-  // In drivers that offer preferences for configuration parameters, you might also iterate over
-  // then and send ConfigurationSet commands as needed here (or in configure() if implemented)
+
+  if (logEnable) runIn(30 * 60, "logsOff")
 }
 
 // handler method for scheduled job to disable debug logging:
@@ -83,8 +80,7 @@ def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
 }
 
 def zwaveEvent(hubitat.zwave.Command cmd) {
-  // Just noting that the data was parsed into something we aren't handling in this driver:
-  if (logEnable) log.debug "skip: ${cmd}"
+  if (logEnable) log.debug "Ignoring command: ${cmd}"
 }
 
 /*

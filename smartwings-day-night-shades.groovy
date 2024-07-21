@@ -10,9 +10,9 @@ import groovy.transform.Field
 ]
 
 metadata {
-   definition (name: "My Z-Wave Switch", namespace: "MyNamespace", author: "My Name") {
+   definition (name: "SmartWings Day/Night Cellular Shades", namespace: "ExMember", author: "Damien Burke") {
       capability "Actuator"
-      capability "Switch"
+      capability "WindowShade"
    }
 
    preferences {
@@ -80,14 +80,28 @@ def zwaveEvent(hubitat.zwave.Command cmd) {
    if (logEnable) log.debug "skip: ${cmd}"
 }
 
-def on() {
-   if (logEnable) log.debug "on()"
-   def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
-   zwaveSecureEncap(cmd.format())
+// WindowShade methods
+def close() {
+   if (logEnable) log.debug "close()"
+   // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
+   // zwaveSecureEncap(cmd.format())
 }
 
-def off() {
-   if (logEnable) log.debug "off()"
-   def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00)
-   zwaveSecureEncap(cmd.format())
+def open() {
+   if (logEnable) log.debug "open()"
+   // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00)
+   // zwaveSecureEncap(cmd.format())
+}
+
+def setPosition(Number position) {
+   if (logEnable) log.debug "setPosition(${position})"
+}
+
+def startPositionChange(String direction) {
+    // direction is "open" or "close"
+   if (logEnable) log.debug "startPositionChange(${direction})"
+}
+
+def stopPositionChange() {
+   if (logEnable) log.debug "stopPositionChange()"
 }

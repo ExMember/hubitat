@@ -1,12 +1,25 @@
 import groovy.transform.Field
 
 @Field static final Map commandClassVersions = [
-   0x20: 1,    // Basic
-   0x25: 1,    // SwitchBinary
-   0x6C: 1,    // Supervision
-   0x70: 1,    // Configuration
-   0x86: 2,    // Version
-   0x9F: 1     // Security S2
+  0x20: 2, // Basic
+  0x22: 1, // Application Status
+  0x26: 3, // Switch Multilevel (device supports v4, hub does not)
+  0x50: 1, // (Basic) Window Covering
+  0x55: 1, // Transport Service (device supports v2, hub does not)
+  0x59: 1, // Association Grp Info
+  0x5A: 1, // Device Reset Locally
+  0x5E: 2, // Zwaveplus Info
+  0x60: 4, // Multichannel
+  0x6C: 1, // Supervision
+  0x70: 4, // Configuration
+  0x72: 2, // Manufacturer Specific
+  0x73: 1, // Powerlevel
+  0x7A: 5, // Firmware Update Md
+  0x80: 1, // Battery V1
+  0x85: 2, // Association
+  0x86: 3, // Version
+  0x87: 3, // Indicator
+  0x8E: 3, // Multi Channel Association
 ]
 
 metadata {

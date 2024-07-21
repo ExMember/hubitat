@@ -65,15 +65,14 @@ def parse(String description) {
    }
 }
 
+/*
+ **********************
+ * zwaveEvent Methods *
+ **********************
+ */
+
 def zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
    if (enableDebug) log.debug "BasicReport:  ${cmd}"
-   // Going to ignore this on our driver; our device maps Basic to SwitchBinary
-}
-
-def zwaveEvent(hubitat.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
-   String value = (cmd.value ? "on" : "off")
-   if (txtEnable) log.info "${device.displayName} switch is ${value}"
-   sendEvent(name: "switch", value: value)
 }
 
 def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
@@ -85,15 +84,16 @@ def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
    sendHubCommand(new hubitat.device.HubAction(zwaveSecureEncap(zwave.supervisionV1.supervisionReport(sessionID: cmd.sessionID, reserved: 0, moreStatusUpdates: false, status: 0xFF, duration: 0).format()), hubitat.device.Protocol.ZWAVE))
 }
 
-// Possible additional zwaveEvent() methods here
-// ...
-
 def zwaveEvent(hubitat.zwave.Command cmd) {
    // Just noting that the data was parsed into something we aren't handling in this driver:
    if (logEnable) log.debug "skip: ${cmd}"
 }
 
-// WindowShade methods
+/*
+ ***********************
+ * WindowShade methods *
+ ***********************
+ */
 def close() {
    if (logEnable) log.debug "close()"
    // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)

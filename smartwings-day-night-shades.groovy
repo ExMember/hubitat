@@ -95,26 +95,62 @@ def zwaveEvent(hubitat.zwave.Command cmd) {
  ***********************
  */
 def close() {
-   if (logEnable) log.debug "close()"
-   // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
-   // zwaveSecureEncap(cmd.format())
+  if (logEnable) log.debug "close()"
+
+  // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
+  def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: true)
+  log.debug "Command: ${cmd.format()}"
+
+
+  zwaveSecureEncap(cmd.format())
 }
 
 def open() {
    if (logEnable) log.debug "open()"
+
    // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00)
-   // zwaveSecureEncap(cmd.format())
+    def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: false)
+  log.debug "Command: ${cmd.format()}"
+
+   zwaveSecureEncap(cmd.format())
 }
 
 def setPosition(Number position) {
    if (logEnable) log.debug "setPosition(${position})"
+
+    def cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+      dimmingDuration: 1, value: position
+    )
+    log.debug "Command: ${cmd.format()}"
+
+   zwaveSecureEncap(cmd.format())
 }
 
+// direction is "open" or "close"
 def startPositionChange(String direction) {
-    // direction is "open" or "close"
    if (logEnable) log.debug "startPositionChange(${direction})"
+
+   def cmd
+   if(direction == "open") {
+     cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+       dimmingDuration: 1, value: 0
+     )
+   }
+   if(direction == "close") {
+     cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+       dimmingDuration: 1, value: 0
+     )
+   }
+  log.debug "Command: ${cmd.format()}"
+
+   zwaveSecureEncap(cmd.format())
 }
 
 def stopPositionChange() {
    if (logEnable) log.debug "stopPositionChange()"
+
+   def cmd = zwave.switchMultilevelV3.switchMultilevelStopLevelChange()
+  log.debug "Command: ${cmd.format()}"
+
+   zwaveSecureEncap(cmd.format())
 }

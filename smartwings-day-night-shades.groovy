@@ -23,46 +23,46 @@ import groovy.transform.Field
 ]
 
 metadata {
-   definition (name: "SmartWings Day/Night Cellular Shades", namespace: "ExMember", author: "Damien Burke") {
-      capability "Battery"
-      capability "WindowShade"
-   }
+  definition (name: "SmartWings Day/Night Cellular Shades", namespace: "ExMember", author: "Damien Burke") {
+    capability "Battery"
+    capability "WindowShade"
+  }
 
-   preferences {
-      // Z-Wave devices will often include preferences for configuration parameters here
-      input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
-      input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
-   }
+  preferences {
+    // Z-Wave devices will often include preferences for configuration parameters here
+    input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+    input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
+  }
 }
 
 def installed() {
-   log.debug "installed()"
-   // Sometimes you may wish to initialize attributes to default values here or
-   // call refresh() to fetch them (not implemented in this driver currently, but
-   // a reasonable command to implement for many devices)
+  log.debug "installed()"
+  // Sometimes you may wish to initialize attributes to default values here or
+  // call refresh() to fetch them (not implemented in this driver currently, but
+  // a reasonable command to implement for many devices)
 }
 
 def updated() {
-   log.debug "updated()"
-   log.warn "debug logging is: ${logEnable == true}"
-   log.warn "description logging is: ${txtEnable == true}"
-   if (logEnable) runIn(1800, "logsOff")  // 1800 seconds = 30 minutes
-   // In drivers that offer preferences for configuration parameters, you might also iterate over
-   // then and send ConfigurationSet commands as needed here (or in configure() if implemented)
+  log.debug "updated()"
+  log.warn "debug logging is: ${logEnable == true}"
+  log.warn "description logging is: ${txtEnable == true}"
+  if (logEnable) runIn(1800, "logsOff")  // 1800 seconds = 30 minutes
+  // In drivers that offer preferences for configuration parameters, you might also iterate over
+  // then and send ConfigurationSet commands as needed here (or in configure() if implemented)
 }
 
 // handler method for scheduled job to disable debug logging:
 void logsOff(){
-    log.warn "debug logging disabled..."
-    device.updateSetting("logEnable", [value:"false", type:"bool"])
+  log.warn "debug logging disabled..."
+  device.updateSetting("logEnable", [value:"false", type:"bool"])
 }
 
 def parse(String description) {
-   if (logEnable) log.debug "parse description: $description"
-   def cmd = zwave.parse(description, commandClassVersions)
-   if (cmd) {
-      zwaveEvent(cmd)
-   }
+  if (logEnable) log.debug "parse description: $description"
+  def cmd = zwave.parse(description, commandClassVersions)
+  if (cmd) {
+    zwaveEvent(cmd)
+  }
 }
 
 /*
@@ -72,7 +72,7 @@ def parse(String description) {
  */
 
 def zwaveEvent(hubitat.zwave.commands.basicv1.BasicReport cmd) {
-   if (enableDebug) log.debug "BasicReport:  ${cmd}"
+  if (enableDebug) log.debug "BasicReport:  ${cmd}"
 }
 
 def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
@@ -85,8 +85,8 @@ def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
 }
 
 def zwaveEvent(hubitat.zwave.Command cmd) {
-   // Just noting that the data was parsed into something we aren't handling in this driver:
-   if (logEnable) log.debug "skip: ${cmd}"
+  // Just noting that the data was parsed into something we aren't handling in this driver:
+  if (logEnable) log.debug "skip: ${cmd}"
 }
 
 /*
@@ -99,58 +99,60 @@ def close() {
 
   // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
   def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: true)
-  log.debug "Command: ${cmd.format()}"
 
+  log.debug "Command: ${cmd.format()}"
 
   zwaveSecureEncap(cmd.format())
 }
 
 def open() {
-   if (logEnable) log.debug "open()"
+  if (logEnable) log.debug "open()"
 
-   // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0x00)
-    def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: false)
+  def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: false)
+
   log.debug "Command: ${cmd.format()}"
 
-   zwaveSecureEncap(cmd.format())
+  zwaveSecureEncap(cmd.format())
 }
 
 def setPosition(Number position) {
-   if (logEnable) log.debug "setPosition(${position})"
+  if (logEnable) log.debug "setPosition(${position})"
 
-    def cmd = zwave.switchMultilevelV3.switchMultilevelSet(
-      dimmingDuration: 1, value: position
-    )
-    log.debug "Command: ${cmd.format()}"
+  def cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+    dimmingDuration: 1, value: position
+  )
 
-   zwaveSecureEncap(cmd.format())
+  log.debug "Command: ${cmd.format()}"
+
+  zwaveSecureEncap(cmd.format())
 }
 
 // direction is "open" or "close"
 def startPositionChange(String direction) {
-   if (logEnable) log.debug "startPositionChange(${direction})"
+  if (logEnable) log.debug "startPositionChange(${direction})"
 
-   def cmd
-   if(direction == "open") {
-     cmd = zwave.switchMultilevelV3.switchMultilevelSet(
-       dimmingDuration: 1, value: 0
-     )
-   }
-   if(direction == "close") {
-     cmd = zwave.switchMultilevelV3.switchMultilevelSet(
-       dimmingDuration: 1, value: 0
-     )
-   }
+  def cmd
+  if(direction == "open") {
+    cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+      dimmingDuration: 1, value: 0
+    )
+  }
+  if(direction == "close") {
+    cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+      dimmingDuration: 1, value: 0
+    )
+  }
+
   log.debug "Command: ${cmd.format()}"
 
-   zwaveSecureEncap(cmd.format())
+  zwaveSecureEncap(cmd.format())
 }
 
 def stopPositionChange() {
-   if (logEnable) log.debug "stopPositionChange()"
+  if (logEnable) log.debug "stopPositionChange()"
 
-   def cmd = zwave.switchMultilevelV3.switchMultilevelStopLevelChange()
+  def cmd = zwave.switchMultilevelV3.switchMultilevelStopLevelChange()
   log.debug "Command: ${cmd.format()}"
 
-   zwaveSecureEncap(cmd.format())
+  zwaveSecureEncap(cmd.format())
 }

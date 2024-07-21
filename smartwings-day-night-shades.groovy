@@ -24,7 +24,7 @@ import groovy.transform.Field
 
 metadata {
    definition (name: "SmartWings Day/Night Cellular Shades", namespace: "ExMember", author: "Damien Burke") {
-      capability "Actuator"
+      capability "Battery"
       capability "WindowShade"
    }
 

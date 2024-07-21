@@ -29,9 +29,7 @@ metadata {
   }
 
   preferences {
-    // Z-Wave devices will often include preferences for configuration parameters here
     input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
-    input name: "txtEnable", type: "bool", title: "Enable descriptionText logging", defaultValue: true
   }
 }
 

@@ -91,9 +91,9 @@ def zwaveEvent(hubitat.zwave.Command cmd) {
 def close() {
   if (logEnable) log.debug "close()"
 
-  // def cmd = zwave.switchBinaryV1.switchBinarySet(switchValue: 0xFF)
-  def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: true)
-
+  def cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+      dimmingDuration: 1, value: 0
+    )
   log.debug "Command: ${cmd.format()}"
 
   zwaveSecureEncap(cmd.format())
@@ -102,13 +102,13 @@ def close() {
 def open() {
   if (logEnable) log.debug "open()"
 
-  def cmd = zwave.basicWindowCoveringV1.basicWindowCoveringStartLevelChange(openClose: false)
-
+  def cmd = zwave.switchMultilevelV3.switchMultilevelSet(
+      dimmingDuration: 1, value: 99
+    )
   log.debug "Command: ${cmd.format()}"
 
   zwaveSecureEncap(cmd.format())
 }
-
 def setPosition(Number position) {
   if (logEnable) log.debug "setPosition(${position})"
 
@@ -133,7 +133,7 @@ def startPositionChange(String direction) {
   }
   if(direction == "close") {
     cmd = zwave.switchMultilevelV3.switchMultilevelSet(
-      dimmingDuration: 1, value: 0
+      dimmingDuration: 1, value: 99
     )
   }
 

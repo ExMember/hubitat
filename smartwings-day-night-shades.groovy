@@ -25,7 +25,16 @@ import groovy.transform.Field
 metadata {
   definition (name: "SmartWings Day/Night Cellular Shades", namespace: "ExMember", author: "Damien Burke") {
     capability "Battery"
+    capability "Configuration"
     capability "WindowShade"
+    capability "Refresh"
+
+    command "topRailPosition", [
+			[name:"Position*", description:"Final position", type: "NUMBER"]
+    ]
+    command "bottomRailPosition", [
+			[name:"Position*", description:"Final position", type: "NUMBER"]
+    ]
   }
 
   preferences {
@@ -53,7 +62,7 @@ void logsOff(){
 }
 
 def parse(String description) {
-  if (logEnable) log.debug "parse description: $description"
+  // log.debug "parse description: $description"
   def cmd = zwave.parse(description, commandClassVersions)
   if (cmd) {
     zwaveEvent(cmd)
@@ -79,8 +88,87 @@ def zwaveEvent(hubitat.zwave.commands.supervisionv1.SupervisionGet cmd) {
    sendHubCommand(new hubitat.device.HubAction(zwaveSecureEncap(zwave.supervisionV1.supervisionReport(sessionID: cmd.sessionID, reserved: 0, moreStatusUpdates: false, status: 0xFF, duration: 0).format()), hubitat.device.Protocol.ZWAVE))
 }
 
+def zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport report) {
+  if (logEnable) log.debug "BatteryReport - battery level: ${report.batteryLevel}, payload: ${report.getPayload()}, format: ${report.format()}"
+  state.batteryLevel = report.batteryLevel
+}
+
+def zwaveEvent(hubitat.zwave.commands.multichannelv4.MultiChannelEndPointReport report) {
+  if (logEnable) log.debug "MultiChannelEndPointReport - aggregatedEndPoints: ${report.aggregatedEndPoints}, dynamic: ${report.dynamic}, endPoints: ${report.endPoints}, identical: ${report.identical}"
+}
+
+def zwaveEvent(hubitat.zwave.commands.multichannelv4.MultiChannelEndPointFindReport report) {
+  if (logEnable) log.debug "MultiChannelEndPointFindReport - genericDeviceClass: ${report.genericDeviceClass}, specificDeviceClass: ${report.specificDeviceClass}, reportsToFollow: ${report.reportsToFollow}"
+}
+
+
 def zwaveEvent(hubitat.zwave.Command cmd) {
-  if (logEnable) log.debug "Ignoring command: ${cmd}"
+  //if (logEnable) log.debug "Ignoring command: ${cmd}"
+  log.debug "Ignoring command: ${cmd}"
+}
+
+def topRailPosition(Number position) {
+  log.debug "topRailPosition ${position}"
+  position_set_command = zwave.switchMultilevelV3.switchMultilevelSet(
+    dimmingDuration: 1, value: position
+  )
+  cmd = zwave.multiChannelV3.multiChannelCmdEncap(destinationEndPoint: 2).encapsulate(position_set_command)
+    
+  cmd.format()
+}
+
+def bottomRailPosition(Number position) {
+  log.debug "bottomRailPosition ${position}"
+  position_set_command = zwave.switchMultilevelV3.switchMultilevelSet(
+    dimmingDuration: 1, value: position
+  )
+  cmd = zwave.multiChannelV3.multiChannelCmdEncap(destinationEndPoint: 1).encapsulate(position_set_command)
+    
+  cmd.format()
+}
+
+/*
+ *************************
+ * Configuration methods *
+ *************************
+ */
+def configure() {
+  log.debug "configure()"
+
+  // def cmd = zwave.multiChannelV4.multiChannelEndPointFind(
+  //     genericDeviceClass: GENERIC_TYPE_SWITCH_MULTILEVEL,
+  //     specificDeviceClass: SPECIFIC_TYPE_CLASS_C_MOTOR_CONTROL
+  //   )
+
+  def cmd = zwave.batteryV1.batteryGet()
+  log.debug "Command batt get: ${cmd.format()}"
+
+  zwaveSecureEncap(cmd.format())
+}
+
+/*
+ *******************
+ * Refresh methods *
+ *******************
+ */
+def refresh() {
+  log.debug "Refresh()"
+  // def cmd = zwave.multiChannelV4.multiChannelEndPointFind(
+  //     genericDeviceClass: GENERIC_TYPE_SWITCH_MULTILEVEL,
+  //     specificDeviceClass: SPECIFIC_TYPE_CLASS_C_MOTOR_CONTROL
+  //   )
+
+  def battery_command = zwave.batteryV1.batteryGet()
+  def second_command = zwave.multiChannelV4.multiChannelEndPointGet()
+
+  //log.debug "Refresh command: ${cmd.format()}"
+
+  [
+    zwaveSecureEncap(battery_command),
+    zwaveSecureEncap(second_command),
+    zwaveSecureEncap(zwave.multiChannelV4.multiChannelCapabilityGet()),
+    zwaveSecureEncap(zwave.multiChannelV4.multiChannelEndPointFind()),
+  ]
 }
 
 /*

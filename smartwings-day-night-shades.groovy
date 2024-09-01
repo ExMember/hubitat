@@ -28,10 +28,8 @@ metadata {
     capability "WindowShade"
     capability "Refresh"
 
-    command "topRailPosition", [
-			[name:"Position*", description:"Final position", type: "NUMBER"]
-    ]
-    command "bottomRailPosition", [
+    command "setRailPosition", [
+			[name:"Rail*", type: "ENUM", constraints: ["bottom", "top", "both"]],
 			[name:"Position*", description:"Final position", type: "NUMBER"]
     ]
   }
@@ -94,16 +92,15 @@ def zwaveEvent(hubitat.zwave.Command cmd) {
  ***********************
  */
 
-def dualRailPosition(Number position) {
-  railPosition(0, position)
-}
-
-def bottomRailPosition(Number position) {
-  railPosition(1, position)
-}
-
-def topRailPosition(Number position) {
-  railPosition(2, position)
+def setRailPosition(String railName, Number position) {
+  rail = 0
+  if(railName == "bottom") {
+    rail = 1
+  }else if(railName == "top") {
+    rail = 2
+  }
+  
+  railPosition(rail, position)
 }
 
 def railPosition(Number rail, Number position) {
@@ -138,15 +135,15 @@ def refresh() {
  ***********************
  */
 def close() {
-  dualRailPosition(0)
+  setRailPosition("both", 0)
 }
 
 def open() {
-  dualRailPosition(99)
+  setRailPosition("both", 99)
 }
 
 def setPosition(Number position) {
-  dualRailPosition(position)
+  setRailPosition("both", position)
 }
 
 // direction is "open" or "close"
